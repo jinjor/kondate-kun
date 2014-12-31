@@ -1,0 +1,125 @@
+/* reset */
+body {
+	margin: 0;
+}
+h1 {
+	margin: 0;
+}
+h2 {
+	margin: 0;
+}
+
+/* base */
+
+
+/* components */
+
+
+
+/* app */
+body {
+	color: #444;
+	font-size: 14px;
+	font-family: "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "游ゴシック", YuGothic, "メイリオ", Meiryo, sans-serif;
+}
+header {
+	box-shadow: 0px 0px 3px rgba(0,0,0,0.4);
+	background-color: #8b7;
+	color: #fff;
+}
+h2 {
+	margin: 0 0 10px;
+}
+h1 {
+	padding: 5px;
+	font-size: large;
+}
+.app-main {
+	display: flex;
+	padding: 15px 5px;
+}
+.calendar {
+	width: 700px;
+	font-family: 'Quicksand', sans-serif;
+}
+.calendar-header {
+	position: relative;
+	display: flex;
+	margin-bottom: 10px;
+}
+.caption {
+	margin: auto;
+	font-size: x-large;
+	font-weight: bold;
+}
+.next-prev-month {
+	position: absolute;
+	right: 0;
+}
+.next-prev-month > button {
+	background: #fd9;
+	border: none;
+	height: 25px;
+	width: 25px;
+	border-radius: 25px;
+	color: white;
+	margin-left: 4px;
+	font-weight: bold;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+.date {
+	width: 100px;
+	height: 100px;
+}
+.date {
+	border:solid 1px #ddd;
+}
+.date.selected {
+	background-color: #fec;
+}
+.date > div {
+	height: 100%;
+}
+.date > div > div:first-child {
+	font-weight: bold;
+	text-align: center;
+	width: 20px;
+	height: 20px;
+	border-radius: 20px;
+	border-style: none;
+	border-width: 1px;
+	color: #999;
+}
+.date:first-child > div > div:first-child {
+	color: #fa4;
+}
+.date:last-child > div > div:first-child {
+	color: #4af;
+}
+.date > div > div:not(:first-child) {
+	font-family: "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "游ゴシック", YuGothic, "メイリオ", Meiryo, sans-serif;
+}
+.detail {
+	padding: 12px;
+	margin-left: 10px;
+	border-radius: 8px;
+	background-color: #fec;
+}
+.detail input {
+	font-size: x-large;
+	border-top: none;
+	border-left: none;
+	border-right: none;
+	border-bottom: solid 1px #bbb;
+	color: inherit;
+	background-color: inherit;
+	
+}
+.detail label {
+	font-size: large;
+	margin-right: 10px;
+}

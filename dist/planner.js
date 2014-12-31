@@ -6,8 +6,17 @@ var Detail = require('./detail.js');
 var menuDao = new MenuDao();
 
 var App = React.createClass({displayName: "App",
+  componentDidMount: function() {
+    window.addEventListener('hashchange', function() {
+      var hash = location.hash.substring(1);
+      var state = this.state;
+      state.hash = hash;
+      this.setState(state);
+    }.bind(this));
+  },
   getInitialState: function() {
     return {
+      hash: location.hash.substring(1),
       show: {
         year: 2015,
         month: 1
@@ -20,13 +29,12 @@ var App = React.createClass({displayName: "App",
     };
   },
   onChangeMonth: function(year, month) {
-    this.setState({
-      show: {
-        year: year,
-        month: month
-      },
-      selected: this.state.selected
-    });
+    var state = this.state;
+    state.show = {
+      year: year,
+      month: month
+    };
+    this.setState(state);
   },
   onSelect: function(year, month, date) {
     this.setState({
@@ -44,12 +52,44 @@ var App = React.createClass({displayName: "App",
   },
   render: function() {
     console.log('App#render');
+    var cx = React.addons.classSet;
+    var active = function(page, _default) {
+      if(_default && this.state.hash === '') {
+        return true;
+      }
+      return this.state.hash === page;
+    }.bind(this);
+    var calendarTabClasses = cx({
+      'header-tab': true,
+      'active': active('calendar', true)
+    });
+    var repertoryTabClasses = cx({
+      'header-tab': true,
+      'active': active('repertory')
+    });
+    var calendarContentClasses = cx({
+      'header-tab-content-calendar': true,
+      'hidden': !active('calendar', true)
+    });
+    var repertoryContentClasses = cx({
+      'header-tab-content-repertory': true,
+      'hidden': !active('repertory')
+    });
     return (
       React.createElement("div", {className: "app"}, 
-        React.createElement("header", null, React.createElement("h1", null, "こんだて君", React.createElement("small", null, " beta"))), 
+        React.createElement("header", null, 
+          React.createElement("h1", null, "こんだて君", React.createElement("small", null, " beta")), 
+          React.createElement("a", {className: calendarTabClasses, href: "#calendar"}, "カレンダー"), 
+          React.createElement("a", {className: repertoryTabClasses, href: "#repertory"}, "レパートリー")
+        ), 
         React.createElement("main", {className: "app-main"}, 
-          React.createElement(Calendar, {show: this.state.show, selected: this.state.selected, onSelect: this.onSelect, onChangeMonth: this.onChangeMonth}), 
-          React.createElement(Detail, {show: this.state.selected, onChangeData: this.saveData})
+          React.createElement("div", {className: calendarContentClasses}, 
+            React.createElement(Calendar, {show: this.state.show, selected: this.state.selected, onSelect: this.onSelect, onChangeMonth: this.onChangeMonth}), 
+            React.createElement(Detail, {show: this.state.selected, onChangeData: this.saveData})
+          ), 
+          React.createElement("div", {className: repertoryContentClasses}, 
+            "repertory"
+          )
         )
       )
     );

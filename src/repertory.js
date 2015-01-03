@@ -4,7 +4,7 @@ var menuDao = new MenuDao();
 
 var Repertory = React.createClass({
   render: function() {
-    var repertories = menuDao.getAllRepertory();
+    var repertories = menuDao.getRepertories();
     var repertoryViewList = repertories.map(function(repertory) {
       return (<li key={repertory.name}>{repertory.name}({repertory.days.length})</li>);
     });

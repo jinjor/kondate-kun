@@ -211,34 +211,48 @@ var MenuDao = require('./menu-dao.js');
 var menuDao = new MenuDao();
 
 var Detail = React.createClass({displayName: "Detail",
-  saveBreakfast: function(data, e) {
-    data.breakfast.name = e.target.value;
+  saveName: function(data, menu, e) {
+    menu.name = e.target.value;
     this.props.onChangeData(data);
   },
-  saveLunch: function(data, e) {
-    data.lunch.name = e.target.value;
-    this.props.onChangeData(data);
-  },
-  saveDinner: function(data, e) {
-    data.dinner.name = e.target.value;
+  saveFav: function(data, menu) {
+    menu.fav = !menu.fav;
     this.props.onChangeData(data);
   },
   render: function() {
     var data = menuDao.findByDate(this.props.show.year, this.props.show.month, this.props.show.date);
     var date = this.props.show.month + '月' + this.props.show.date + '日の食卓';
+    var cx = React.addons.classSet;
+    var breakfastFavClass = cx({
+      'fav': true,
+      'favored': !!data.breakfast.fav
+    });
+    var lunchFavClass = cx({
+      'fav': true,
+      'favored': !!data.lunch.fav
+    });
+    var dinnerFavClass = cx({
+      'fav': true,
+      'favored': !!data.dinner.fav
+    });
     return (
       React.createElement("section", {className: "detail"}, 
         React.createElement("h2", null, date), 
         React.createElement("form", {className: "form"}, 
           React.createElement("div", null, 
             React.createElement("label", {htmlFor: "breakfast"}, "朝"), 
-            React.createElement("input", {id: "breakfast", value: data.breakfast.name, onChange: this.saveBreakfast.bind(this, data)})
+            React.createElement("input", {id: "breakfast", value: data.breakfast.name, onChange: this.saveName.bind(this, data, data.breakfast)}), 
+            React.createElement("span", {onClick: this.saveFav.bind(this, data, data.breakfast), className: breakfastFavClass}, "★")
           ), 
           React.createElement("div", null, 
             React.createElement("label", {htmlFor: "lunch"}, "昼"), 
-            React.createElement("input", {id: "lunch", value: data.lunch.name, onChange: this.saveLunch.bind(this, data)})
+            React.createElement("input", {id: "lunch", value: data.lunch.name, onChange: this.saveName.bind(this, data, data.lunch)}), 
+            React.createElement("span", {onClick: this.saveFav.bind(this, data, data.lunch), className: lunchFavClass}, "★")
           ), 
-          React.createElement("div", null, React.createElement("label", {htmlFor: "dinner"}, "夜"), React.createElement("input", {id: "dinner", value: data.dinner.name, onChange: this.saveDinner.bind(this, data)}))
+          React.createElement("div", null, React.createElement("label", {htmlFor: "dinner"}, "夜"), 
+            React.createElement("input", {id: "dinner", value: data.dinner.name, onChange: this.saveName.bind(this, data, data.dinner)}), 
+            React.createElement("span", {onClick: this.saveFav.bind(this, data, data.dinner), className: dinnerFavClass}, "★")
+          )
         )
       )
     );
@@ -272,11 +286,11 @@ var days = {
 function MenuDao() {
 
 };
-MenuDao.prototype.getAllRepertory = function() {
+MenuDao.prototype.getRepertories = function(all) {
   var _menus = {};
   Object.keys(repertories).forEach(function(name) {
     var data = repertories[name];
-    _menus[name] = data;//TODO clone
+    _menus[name] = JSON.parse(JSON.stringify(data));
     _menus[name].days = [];
   });
   Object.keys(days).forEach(function(date) {
@@ -284,11 +298,13 @@ MenuDao.prototype.getAllRepertory = function() {
     ['breakfast', 'lunch', 'dinner'].forEach(function(key) {
       var name = data[key];
       if(name) {
-        if(!_menus[name]) {
+        if(all && !_menus[name]) {
           _menus[name] = (this._findMenuDetailOrDefault(name));
           _menus[name].days = [];
         }
-        _menus[name].days.push(date);
+        if(_menus[name]) {
+          _menus[name].days.push(date);
+        }
       }
     }.bind(this));
     return data;
@@ -309,7 +325,7 @@ MenuDao.prototype.findByDate = function(year, month, date) {
   };
   var data = {};
   ['breakfast', 'lunch', 'dinner'].forEach(function(key) {
-    data[key] = this._findMenuDetailOrDefault(day[key]);
+    data[key] = JSON.parse(JSON.stringify(this._findMenuDetailOrDefault(day[key])));
   }.bind(this));
   data.others = day.others;
   return data;
@@ -345,7 +361,7 @@ var menuDao = new MenuDao();
 
 var Repertory = React.createClass({displayName: "Repertory",
   render: function() {
-    var repertories = menuDao.getAllRepertory();
+    var repertories = menuDao.getRepertories();
     var repertoryViewList = repertories.map(function(repertory) {
       return (React.createElement("li", {key: repertory.name}, repertory.name, "(", repertory.days.length, ")"));
     });

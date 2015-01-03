@@ -22,11 +22,11 @@ var days = {
 function MenuDao() {
 
 };
-MenuDao.prototype.getAllRepertory = function() {
+MenuDao.prototype.getRepertories = function(all) {
   var _menus = {};
   Object.keys(repertories).forEach(function(name) {
     var data = repertories[name];
-    _menus[name] = data;//TODO clone
+    _menus[name] = JSON.parse(JSON.stringify(data));
     _menus[name].days = [];
   });
   Object.keys(days).forEach(function(date) {
@@ -34,11 +34,13 @@ MenuDao.prototype.getAllRepertory = function() {
     ['breakfast', 'lunch', 'dinner'].forEach(function(key) {
       var name = data[key];
       if(name) {
-        if(!_menus[name]) {
+        if(all && !_menus[name]) {
           _menus[name] = (this._findMenuDetailOrDefault(name));
           _menus[name].days = [];
         }
-        _menus[name].days.push(date);
+        if(_menus[name]) {
+          _menus[name].days.push(date);
+        }
       }
     }.bind(this));
     return data;
@@ -59,7 +61,7 @@ MenuDao.prototype.findByDate = function(year, month, date) {
   };
   var data = {};
   ['breakfast', 'lunch', 'dinner'].forEach(function(key) {
-    data[key] = this._findMenuDetailOrDefault(day[key]);
+    data[key] = JSON.parse(JSON.stringify(this._findMenuDetailOrDefault(day[key])));
   }.bind(this));
   data.others = day.others;
   return data;

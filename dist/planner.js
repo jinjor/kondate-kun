@@ -2,6 +2,7 @@
 var MenuDao = require('./menu-dao.js');
 var Calendar = require('./calendar.js');
 var Detail = require('./detail.js');
+var Repertory = require('./repertory.js');
 
 var menuDao = new MenuDao();
 
@@ -51,7 +52,6 @@ var App = React.createClass({displayName: "App",
     this.setState(this.state);
   },
   render: function() {
-    console.log('App#render');
     var cx = React.addons.classSet;
     var active = function(page, _default) {
       if(_default && this.state.hash === '') {
@@ -88,7 +88,7 @@ var App = React.createClass({displayName: "App",
             React.createElement(Detail, {show: this.state.selected, onChangeData: this.saveData})
           ), 
           React.createElement("div", {className: repertoryContentClasses}, 
-            "repertory"
+            React.createElement(Repertory, null)
           )
         )
       )
@@ -100,7 +100,7 @@ React.render(
   React.createElement(App, null),
   document.getElementById('app-container')
 );
-},{"./calendar.js":2,"./detail.js":3,"./menu-dao.js":4}],2:[function(require,module,exports){
+},{"./calendar.js":2,"./detail.js":3,"./menu-dao.js":4,"./repertory.js":5}],2:[function(require,module,exports){
 
 var MenuDao = require('./menu-dao.js');
 
@@ -127,7 +127,6 @@ var Calendar = React.createClass({displayName: "Calendar",
     this.props.onSelect(year, month, date);
   },
   changeMonth: function(prev) {
-    console.log(this.props.show);
     var year = this.props.show.year;
     var month = this.props.show.month + (prev ? -1 : 1);
     if(month === 0) {
@@ -140,7 +139,7 @@ var Calendar = React.createClass({displayName: "Calendar",
     this.props.onChangeMonth(year, month);
   },
   render: function() {
-    
+
     var year = this.props.show.year;
     var month = this.props.show.month;
 
@@ -149,9 +148,8 @@ var Calendar = React.createClass({displayName: "Calendar",
     var selectedDate = this.props.selected.date;
 
     var bodyRows = [[1,2,3,4,5,6,7], [8,9,10,11,12,13,14], [15,16,17,18,19,20,21], [22,23,24,25,26,27,28]];
-    var bodyRowsView = bodyRows.map(function(week) {
+    var bodyRowsView = bodyRows.map(function(week, i) {
       var daysView = week.map(function(date) {
-
         var selected = selectedYear === year && selectedMonth === month && selectedDate === date;
         var cx = React.addons.classSet;
         var classes = cx({
@@ -159,20 +157,25 @@ var Calendar = React.createClass({displayName: "Calendar",
           'selected': selected
         });
         var menu = menuDao.findByDate(year, month, date);
-        return (React.createElement("td", {className: classes, onClick: this.handleClick.bind(this, year, month, date)}, 
+        var key = year + '/' + month + '/' + date;
+
+        return (
+        React.createElement("td", {key: key, className: classes, onClick: this.handleClick.bind(this, year, month, date)}, 
           React.createElement("div", null, 
             React.createElement("div", null, date), 
-            React.createElement("div", null, menu.breakfast), 
-            React.createElement("div", null, menu.lunch), 
-            React.createElement("div", null, menu.dinner)
+            React.createElement("div", null, menu.breakfast.name), 
+            React.createElement("div", null, menu.lunch.name), 
+            React.createElement("div", null, menu.dinner.name)
           )
         ));
       }.bind(this));
-      return (React.createElement("tr", null, daysView));
+      var key = year + '/' + month + '/' + i;
+
+      return (React.createElement("tr", {key: key}, daysView));
     }.bind(this));
     var caption = months[month - 1] + ' ' + year;
     return (
-      React.createElement("div", {className: "calendar"}, 
+      React.createElement("section", {className: "calendar"}, 
       React.createElement("div", {className: "calendar-header"}, 
         React.createElement("span", {className: "caption"}, caption), 
         React.createElement("div", {className: "next-prev-month"}, 
@@ -209,27 +212,33 @@ var menuDao = new MenuDao();
 
 var Detail = React.createClass({displayName: "Detail",
   saveBreakfast: function(data, e) {
-    data.breakfast = e.target.value;
+    data.breakfast.name = e.target.value;
     this.props.onChangeData(data);
   },
   saveLunch: function(data, e) {
-    data.lunch = e.target.value;
+    data.lunch.name = e.target.value;
     this.props.onChangeData(data);
   },
   saveDinner: function(data, e) {
-    data.dinner = e.target.value;
+    data.dinner.name = e.target.value;
     this.props.onChangeData(data);
   },
   render: function() {
     var data = menuDao.findByDate(this.props.show.year, this.props.show.month, this.props.show.date);
     var date = this.props.show.month + '月' + this.props.show.date + '日の食卓';
     return (
-      React.createElement("div", {className: "detail"}, 
+      React.createElement("section", {className: "detail"}, 
         React.createElement("h2", null, date), 
         React.createElement("form", {className: "form"}, 
-          React.createElement("div", null, React.createElement("label", {for: "breakfast"}, "朝"), React.createElement("input", {id: "breakfast", value: data.breakfast, onChange: this.saveBreakfast.bind(this, data)})), 
-          React.createElement("div", null, React.createElement("label", {for: "lunch"}, "昼"), React.createElement("input", {id: "lunch", value: data.lunch, onChange: this.saveLunch.bind(this, data)})), 
-          React.createElement("div", null, React.createElement("label", {for: "dinner"}, "夜"), React.createElement("input", {id: "dinner", value: data.dinner, onChange: this.saveDinner.bind(this, data)}))
+          React.createElement("div", null, 
+            React.createElement("label", {htmlFor: "breakfast"}, "朝"), 
+            React.createElement("input", {id: "breakfast", value: data.breakfast.name, onChange: this.saveBreakfast.bind(this, data)})
+          ), 
+          React.createElement("div", null, 
+            React.createElement("label", {htmlFor: "lunch"}, "昼"), 
+            React.createElement("input", {id: "lunch", value: data.lunch.name, onChange: this.saveLunch.bind(this, data)})
+          ), 
+          React.createElement("div", null, React.createElement("label", {htmlFor: "dinner"}, "夜"), React.createElement("input", {id: "dinner", value: data.dinner.name, onChange: this.saveDinner.bind(this, data)}))
         )
       )
     );
@@ -239,7 +248,13 @@ var Detail = React.createClass({displayName: "Detail",
 module.exports = Detail;
 
 },{"./menu-dao.js":4}],4:[function(require,module,exports){
-var menus = {
+var repertories = {
+  '手巻き寿司': { fav: true, name: '手巻き寿司'  },
+  'パスタ': { fav: true, name: 'パスタ'  },
+  '茄子カレー': { fav: true, name: '茄子カレー'  }
+};
+
+var days = {
   '2015/1/5': {
     breakfast: '納豆ごはん',
     lunch: 'そば',
@@ -257,27 +272,94 @@ var menus = {
 function MenuDao() {
 
 };
-// MenuDao.prototype.findByDate = function(year, month, date, cb) {
-//   cb({
-//     breakfast: null,
-//     lunch: null,
-//     dinner: null,
-//     others: []
-//   });
-// }
-
+MenuDao.prototype.getAllRepertory = function() {
+  var _menus = {};
+  Object.keys(repertories).forEach(function(name) {
+    var data = repertories[name];
+    _menus[name] = data;//TODO clone
+    _menus[name].days = [];
+  });
+  Object.keys(days).forEach(function(date) {
+    var data = days[date];
+    ['breakfast', 'lunch', 'dinner'].forEach(function(key) {
+      var name = data[key];
+      if(name) {
+        if(!_menus[name]) {
+          _menus[name] = (this._findMenuDetailOrDefault(name));
+          _menus[name].days = [];
+        }
+        _menus[name].days.push(date);
+      }
+    }.bind(this));
+    return data;
+  }.bind(this));
+  return Object.keys(_menus).map(function(name) {
+    return _menus[name];
+  });
+};
+MenuDao.prototype._findMenuDetailOrDefault = function(name) {
+  return repertories[name] || {fav: false, name: name};
+};
 MenuDao.prototype.findByDate = function(year, month, date) {
-  return menus[year + '/' + month + '/' + date] || {
+  var day = days[year + '/' + month + '/' + date] || {
     breakfast: '',
     lunch: '',
     dinner: '',
     others: []
   };
+  var data = {};
+  ['breakfast', 'lunch', 'dinner'].forEach(function(key) {
+    data[key] = this._findMenuDetailOrDefault(day[key]);
+  }.bind(this));
+  data.others = day.others;
+  return data;
+};
+MenuDao.prototype._saveMenu = function(menu) {
+  if(menu.fav) {
+    repertories[menu.name] = menu;
+  } else {
+    delete repertories[menu.name];
+  }
+};
+MenuDao.prototype._saveDay = function(year, month, date, data) {
+  days[year + '/' + month + '/' + date] = data;
 };
 MenuDao.prototype.save = function(year, month, date, data) {
-  menus[year + '/' + month + '/' + date] = data;
+  this._saveMenu(data.breakfast);
+  this._saveMenu(data.lunch);
+  this._saveMenu(data.dinner);
+  this._saveDay(year, month, date, {
+    breakfast: data.breakfast.name,
+    lunch: data.lunch.name,
+    dinner: data.dinner.name,
+    others: data.others
+  });
   return data;
 };
 
 module.exports = MenuDao;
-},{}]},{},[1]);
+},{}],5:[function(require,module,exports){
+var MenuDao = require('./menu-dao.js');
+
+var menuDao = new MenuDao();
+
+var Repertory = React.createClass({displayName: "Repertory",
+  render: function() {
+    var repertories = menuDao.getAllRepertory();
+    var repertoryViewList = repertories.map(function(repertory) {
+      return (React.createElement("li", {key: repertory.name}, repertory.name, "(", repertory.days.length, ")"));
+    });
+    return (
+      React.createElement("section", {className: "repertory"}, 
+        React.createElement("h2", null, "レパートリー"), 
+        React.createElement("ul", null, 
+        repertoryViewList
+        )
+      )
+    );
+  }
+});
+
+module.exports = Repertory;
+
+},{"./menu-dao.js":4}]},{},[1]);

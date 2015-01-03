@@ -1,6 +1,7 @@
 var MenuDao = require('./menu-dao.js');
 var Calendar = require('./calendar.js');
 var Detail = require('./detail.js');
+var Repertory = require('./repertory.js');
 
 var menuDao = new MenuDao();
 
@@ -50,7 +51,6 @@ var App = React.createClass({
     this.setState(this.state);
   },
   render: function() {
-    console.log('App#render');
     var cx = React.addons.classSet;
     var active = function(page, _default) {
       if(_default && this.state.hash === '') {
@@ -87,7 +87,7 @@ var App = React.createClass({
             <Detail show={this.state.selected} onChangeData={this.saveData}/>
           </div>
           <div className={repertoryContentClasses}>
-            repertory
+            <Repertory></Repertory>
           </div>
         </main>
       </div>

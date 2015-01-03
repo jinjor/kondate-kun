@@ -24,7 +24,6 @@ var Calendar = React.createClass({
     this.props.onSelect(year, month, date);
   },
   changeMonth: function(prev) {
-    console.log(this.props.show);
     var year = this.props.show.year;
     var month = this.props.show.month + (prev ? -1 : 1);
     if(month === 0) {
@@ -37,7 +36,7 @@ var Calendar = React.createClass({
     this.props.onChangeMonth(year, month);
   },
   render: function() {
-    
+
     var year = this.props.show.year;
     var month = this.props.show.month;
 
@@ -46,9 +45,8 @@ var Calendar = React.createClass({
     var selectedDate = this.props.selected.date;
 
     var bodyRows = [[1,2,3,4,5,6,7], [8,9,10,11,12,13,14], [15,16,17,18,19,20,21], [22,23,24,25,26,27,28]];
-    var bodyRowsView = bodyRows.map(function(week) {
+    var bodyRowsView = bodyRows.map(function(week, i) {
       var daysView = week.map(function(date) {
-
         var selected = selectedYear === year && selectedMonth === month && selectedDate === date;
         var cx = React.addons.classSet;
         var classes = cx({
@@ -56,20 +54,25 @@ var Calendar = React.createClass({
           'selected': selected
         });
         var menu = menuDao.findByDate(year, month, date);
-        return (<td className={classes} onClick={this.handleClick.bind(this, year, month, date)}>
+        var key = year + '/' + month + '/' + date;
+
+        return (
+        <td key={key} className={classes} onClick={this.handleClick.bind(this, year, month, date)}>
           <div>
             <div>{date}</div>
-            <div>{menu.breakfast}</div>
-            <div>{menu.lunch}</div>
-            <div>{menu.dinner}</div>
+            <div>{menu.breakfast.name}</div>
+            <div>{menu.lunch.name}</div>
+            <div>{menu.dinner.name}</div>
           </div>
         </td>);
       }.bind(this));
-      return (<tr>{daysView}</tr>);
+      var key = year + '/' + month + '/' + i;
+
+      return (<tr key={key}>{daysView}</tr>);
     }.bind(this));
     var caption = months[month - 1] + ' ' + year;
     return (
-      <div className="calendar">
+      <section className="calendar">
       <div className="calendar-header">
         <span className="caption">{caption}</span>
         <div className="next-prev-month">
@@ -93,7 +96,7 @@ var Calendar = React.createClass({
           <tr>{bodyRowsView}</tr>
         </tbody>
       </table>
-      </div>
+      </section>
     );
   }
 });

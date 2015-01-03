@@ -13,6 +13,9 @@ h2 {
 
 
 /* components */
+section {
+	padding: 12px;
+}
 .hidden {
 	display: none !important;
 }
@@ -118,7 +121,6 @@ table {
 	font-family: "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "游ゴシック", YuGothic, "メイリオ", Meiryo, sans-serif;
 }
 .detail {
-	padding: 12px;
 	margin-left: 10px;
 	border-radius: 8px;
 	background-color: #fec;
